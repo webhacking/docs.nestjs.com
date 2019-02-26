@@ -1,10 +1,10 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   Input,
-  ChangeDetectionStrategy,
   OnInit,
 } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -13,7 +13,8 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuComponent implements OnInit {
-  @Input() isSidebarOpened = true;
+  @Input()
+  isSidebarOpened = true;
   readonly items = [
     {
       title: 'Introduction',
@@ -50,10 +51,14 @@ export class MenuComponent implements OnInit {
           path: '/fundamentals/circular-dependency',
         },
         {
+          title: 'Injection scopes',
+          path: '/fundamentals/injection-scopes',
+        },
+        {
           title: 'Platform agnosticism',
           path: '/fundamentals/platform-agnosticism',
         },
-        { title: 'Testing', path: '/fundamentals/unit-testing' },
+        { title: 'Testing', path: '/fundamentals/testing' },
       ],
     },
     {
@@ -64,9 +69,13 @@ export class MenuComponent implements OnInit {
         { title: 'Database', path: '/techniques/database' },
         { title: 'Mongo', path: '/techniques/mongodb' },
         { title: 'File upload', path: '/techniques/file-upload' },
+        { title: 'Validation', path: '/techniques/validation' },
+        { title: 'Caching', path: '/techniques/caching' },
+        { title: 'Serialization', path: '/techniques/serialization' },
         { title: 'Logger', path: '/techniques/logger' },
-        { title: 'CORS', path: '/techniques/cors' },
+        { title: 'Security', path: '/techniques/security' },
         { title: 'Configuration', path: '/techniques/configuration' },
+        { title: 'Compression', path: '/techniques/compression' },
         { title: 'HTTP module', path: '/techniques/http-module' },
         { title: 'Model-View-Controller', path: '/techniques/mvc' },
         { title: 'Performance (Fastify)', path: '/techniques/performance' },
@@ -78,16 +87,15 @@ export class MenuComponent implements OnInit {
       isOpened: false,
       children: [
         { title: 'Quick start', path: '/graphql/quick-start' },
-        { title: 'Resolvers map', path: '/graphql/resolvers-map' },
+        { title: 'Resolvers', path: '/graphql/resolvers-map' },
         { title: 'Mutations', path: '/graphql/mutations' },
         { title: 'Subscriptions', path: '/graphql/subscriptions' },
         { title: 'Scalars', path: '/graphql/scalars' },
         {
-          title: 'Guards & interceptors',
-          path: '/graphql/guards-interceptors',
+          title: 'Tooling',
+          path: '/graphql/tooling',
         },
-        { title: 'Schema stitching', path: '/graphql/schema-stitching' },
-        { title: 'IDE', path: '/graphql/ide' },
+        // { title: 'Schema stitching', path: '/graphql/schema-stitching' },
       ],
     },
     {
@@ -110,6 +118,7 @@ export class MenuComponent implements OnInit {
         { title: 'Redis', path: '/microservices/redis' },
         { title: 'MQTT', path: '/microservices/mqtt' },
         { title: 'NATS', path: '/microservices/nats' },
+        { title: 'RabbitMQ', path: '/microservices/rabbitmq' },
         { title: 'gRPC', path: '/microservices/grpc' },
         {
           title: 'Exception filters',
@@ -121,9 +130,9 @@ export class MenuComponent implements OnInit {
       ],
     },
     {
-      title: 'Execution context',
+      title: 'Application context',
       isOpened: false,
-      path: '/execution-context',
+      path: '/application-context',
     },
     {
       title: 'Recipes',
@@ -132,9 +141,11 @@ export class MenuComponent implements OnInit {
         { title: 'TypeORM', path: '/recipes/sql-typeorm' },
         { title: 'Mongoose', path: '/recipes/mongodb' },
         { title: 'Sequelize', path: '/recipes/sql-sequelize' },
-        // { title: 'Authentication (Passport)', path: '/recipes/passport' },
         { title: 'CQRS', path: '/recipes/cqrs' },
         { title: 'OpenAPI (Swagger)', path: '/recipes/swagger' },
+        { title: 'Prisma', path: '/recipes/prisma' },
+        { title: 'Health checks (Terminus)', path: '/recipes/terminus' },
+        { title: 'Documentation', path: '/recipes/documentation' },
       ],
     },
     {
@@ -149,15 +160,14 @@ export class MenuComponent implements OnInit {
       title: 'FAQ',
       isOpened: false,
       children: [
-        { title: 'Express instance', path: '/faq/express-instance' },
+        { title: 'HTTP adapter', path: '/faq/http-adapter' },
         { title: 'Global path prefix', path: '/faq/global-prefix' },
         { title: 'Lifecycle events', path: '/faq/lifecycle-events' },
         { title: 'Hybrid application', path: '/faq/hybrid-application' },
         { title: 'HTTPS & multiple servers', path: '/faq/multiple-servers' },
         {
           title: 'Examples',
-          externalUrl:
-            'https://github.com/kamilmysliwiec/nest/tree/master/sample',
+          externalUrl: 'https://github.com/nestjs/nest/tree/master/sample',
         },
       ],
     },
@@ -167,14 +177,20 @@ export class MenuComponent implements OnInit {
       path: '/migration-guide',
     },
     {
-      title: 'Support me',
+      title: 'Discover',
       isOpened: false,
-      path: '/support',
+      children: [{ title: 'Who is using Nest?', path: '/discover/companies' }],
     },
     {
-      title: 'Version 4',
+      title: 'Enterprise support',
       isOpened: false,
-      externalUrl: 'https://docs.nestjs.com/v4/',
+      path: '/enterprise',
+    },
+    {
+      title: 'Support us',
+      icon: 'pets',
+      isOpened: false,
+      path: '/support',
     },
   ];
 
@@ -185,15 +201,20 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.router.events
-      .filter((event) => event instanceof NavigationEnd)
-      .subscribe((event) => this.toggleCategory());
+      .filter(event => event instanceof NavigationEnd)
+      .subscribe(event => this.toggleCategory());
 
     this.toggleCategory();
   }
 
   toggleCategory() {
     const { firstChild } = this.route.snapshot;
-    if (firstChild.url && firstChild.url[1]) {
+    if (
+      (firstChild.url && firstChild.url[1]) ||
+      (firstChild.url &&
+        firstChild.routeConfig &&
+        firstChild.routeConfig.loadChildren)
+    ) {
       const { path } = firstChild.url[0];
       const index = this.items.findIndex(
         ({ title }) => title.toLowerCase() === path,

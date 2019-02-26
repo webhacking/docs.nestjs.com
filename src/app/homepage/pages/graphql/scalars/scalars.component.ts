@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { BasePageComponent } from '../../page/page.component';
 
 @Component({
@@ -6,19 +6,4 @@ import { BasePageComponent } from '../../page/page.component';
   templateUrl: './scalars.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScalarsComponent extends BasePageComponent {
-  get jsonScalar() {
-    return `
-const resolvers = { JSON: GraphQLJSON };
-const schema = this.graphQLFactory.createSchema({ typeDefs, resolvers });`;
-  }
-
-  get typeDefJson() {
-    return `
-scalar JSON
-
-type Foo {
-  field: JSON
-}`;
-  }
-}
+export class ScalarsComponent extends BasePageComponent {}
